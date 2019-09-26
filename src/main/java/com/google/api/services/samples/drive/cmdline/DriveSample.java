@@ -61,8 +61,8 @@ public class DriveSample {
    */
   private static final String APPLICATION_NAME = "";
 
-  private static final String UPLOAD_FILE_PATH = "Enter File Path";
-  private static final String DIR_FOR_DOWNLOADS = "Enter Download Directory";
+  private static final String UPLOAD_FILE_PATH = "C:\\Users\\TrashDoom\\Desktop\\teste\\teste1\\doc1.txt";
+  private static final String DIR_FOR_DOWNLOADS = "C:\\Users\\TrashDoom\\Desktop\\teste";
   private static final java.io.File UPLOAD_FILE = new java.io.File(UPLOAD_FILE_PATH);
 
   /** Directory to store user credentials. */
@@ -89,8 +89,8 @@ public class DriveSample {
     // load client secrets
     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
         new InputStreamReader(DriveSample.class.getResourceAsStream("/client_secrets.json")));
-    if (clientSecrets.getDetails().getClientId().startsWith("Enter")
-        || clientSecrets.getDetails().getClientSecret().startsWith("Enter ")) {
+    if (clientSecrets.getDetails().getClientId().startsWith("777")
+        || clientSecrets.getDetails().getClientSecret().startsWith("TQ")) {
       System.out.println(
           "Enter Client ID and Secret from https://code.google.com/apis/console/?api=drive "
           + "into drive-cmdline-sample/src/main/resources/client_secrets.json");
@@ -107,7 +107,7 @@ public class DriveSample {
 
   public static void main(String[] args) {
     Preconditions.checkArgument(
-        !UPLOAD_FILE_PATH.startsWith("Enter ") && !DIR_FOR_DOWNLOADS.startsWith("Enter "),
+        !UPLOAD_FILE_PATH.startsWith("c?") && !DIR_FOR_DOWNLOADS.startsWith("c?"),
         "Please enter the upload file path and download directory in %s", DriveSample.class);
 
     try {
@@ -149,11 +149,11 @@ public class DriveSample {
   /** Uploads a file using either resumable or direct media upload. */
   private static File uploadFile(boolean useDirectUpload) throws IOException {
     File fileMetadata = new File();
-    fileMetadata.setTitle(UPLOAD_FILE.getName());
+    fileMetadata.setName(UPLOAD_FILE.getName());
 
     FileContent mediaContent = new FileContent("image/jpeg", UPLOAD_FILE);
 
-    Drive.Files.Insert insert = drive.files().insert(fileMetadata, mediaContent);
+    Drive.Files.Create insert = drive.files().create(fileMetadata, mediaContent);
     MediaHttpUploader uploader = insert.getMediaHttpUploader();
     uploader.setDirectUploadEnabled(useDirectUpload);
     uploader.setProgressListener(new FileUploadProgressListener());
@@ -163,7 +163,7 @@ public class DriveSample {
   /** Updates the name of the uploaded file to have a "drivetest-" prefix. */
   private static File updateFileWithTestSuffix(String id) throws IOException {
     File fileMetadata = new File();
-    fileMetadata.setTitle("drivetest-" + UPLOAD_FILE.getName());
+    fileMetadata.setName("drivetest-" + UPLOAD_FILE.getName());
 
     Drive.Files.Update update = drive.files().update(id, fileMetadata);
     return update.execute();
@@ -177,12 +177,12 @@ public class DriveSample {
     if (!parentDir.exists() && !parentDir.mkdirs()) {
       throw new IOException("Unable to create parent directory");
     }
-    OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getTitle()));
+    OutputStream out = new FileOutputStream(new java.io.File(parentDir, uploadedFile.getName()));
 
     MediaHttpDownloader downloader =
         new MediaHttpDownloader(httpTransport, drive.getRequestFactory().getInitializer());
     downloader.setDirectDownloadEnabled(useDirectDownload);
     downloader.setProgressListener(new FileDownloadProgressListener());
-    downloader.download(new GenericUrl(uploadedFile.getDownloadUrl()), out);
+    downloader.download(new GenericUrl(uploadedFile.getWebViewLink()), out);
   }
 }
